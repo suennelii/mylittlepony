@@ -4,12 +4,12 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("springen")
-black = (0, 0, 0)
+colour = (255, 0, 255)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill(black)
+        self.image = pygame.Surface((40, 40))
+        self.image.fill(colour)
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.y_velocity = 0

@@ -1,58 +1,139 @@
 import pygame
+import random
 
-# Initialisierung von Pygame
+# Initialisierung
 pygame.init()
 
 # Bildschirmgröße
-screen_width = 800
-screen_height = 600
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
 
-# Farben definieren
-black = (0, 0, 0)
-white = (255, 255, 255)
+# Farben
+SKY_BLUE = (135, 206, 235)
+WHITE = (255, 255, 255)
+GRASS_GREEN = (34, 139, 34)
+
+# Himmel und Wiese Größenverhältnis
+sky_height = height * 0.7
+grass_height = height * 0.3
+
+# Wolken
+clouds = []
+for _ in range(6):
+    cloud_x = random.randint(0, width)
+    cloud_y = random.randint(0, int(sky_height / 2))
+    cloud_speed = random.randint(1, 3)
+    clouds.append((cloud_x, cloud_y, cloud_speed))
 
 # Spielfigur laden
 player_image = pygame.image.load("bbc.png.png")
-player_width = 64
-player_height = 64
+player_width = 100
+player_height = 100
 
-# Startposition der Spielfigur
-player_x = (screen_width - player_width) // 2
-player_y = screen_height - player_height - 10
+# Partikel-Effekt
+particles = []
 
-# Erstellen des Bildschirms
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Mein Spiel")
+class Particle:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.size = random.randint(1, 3)
+        self.color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
+        self.vel_x = random.uniform(-1, 1)
+        self.vel_y = random.uniform(-1, 1)
+        self.alpha = 255
+        self.duration = random.randint(30, 60)
 
-image = pygame.image.load("bbc.png.png")
+    def update(self):
+        self.x += self.vel_x
+        self.y += self.vel_y
+        self.alpha -= 255 / self.duration
+        if self.alpha <= 0:
+            particles.remove(self)
 
-# Hauptschleife
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.size)
+
+# Spielerklasse
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.transform.scale(player_image, (player_width, player_height))
+        self.rect = self.image.get_rect()
+        self.rect.center = (width / 2, height / 2)
+        self.y_velocity = 0
+        self.jump_power = -10
+
+    def update(self):
+        self.y_velocity += 1
+        self.rect.y += self.y_velocity
+
+        if self.rect.bottom > height:
+            self.rect.bottom = height
+            self.y_velocity = 0
+
+    def jump(self):
+        self.y_velocity = self.jump_power
+        particles.extend([Particle(self.rect.centerx, self.rect.centery) for _ in range(10)])
+
+# Spieler erstellen
+player = Player()
+all_sprites = pygame.sprite.Group()
+all_sprites.add(player)
+
+# Hauptprogramm
 running = True
+clock = pygame.time.Clock()
 while running:
     # Ereignisse überprüfen
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.jump()
 
-    # Tasteneingaben überprüfen
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        player_x -= 5
+        player.rect.x -= 5
     if keys[pygame.K_RIGHT]:
-        player_x += 5
+        player.rect.x += 5
     if keys[pygame.K_UP]:
-        player_y -= 5
+        player.rect.y -= 5
     if keys[pygame.K_DOWN]:
-        player_y += 5
+        player.rect.y += 5
 
-    # Bildschirm löschen
-    screen.fill(white)
+    # Hintergrund zeichnen
+    screen.fill(SKY_BLUE)  # Himmel
+    pygame.draw.rect(screen, GRASS_GREEN, (0, height - grass_height, width, grass_height))  # Wiese
 
-    # Spielfigur anzeigen
-    screen.blit(player_image, (player_x, player_y))
+    # Wolken bewegen
+    for i in range(len(clouds)):
+        cloud_x, cloud_y, cloud_speed = clouds[i]
+        cloud_x -= cloud_speed
+        if cloud_x < -200:
+            cloud_x = width
+            cloud_y = random.randint(0, int(sky_height / 2))
+            cloud_speed = random.randint(1, 3)
+        clouds[i] = (cloud_x, cloud_y, cloud_speed)
 
-    # Bildschirm aktualisieren
+        # Wolken zeichnen
+        pygame.draw.ellipse(screen, WHITE, (cloud_x, cloud_y, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y - 25, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 50, cloud_y, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y + 25, 100, 50))
+
+    # Partikel-Effekte aktualisieren und zeichnen
+    for particle in particles:
+        particle.update()
+        particle.draw(screen)
+
+    all_sprites.update()
+    all_sprites.draw(screen)
+
+    # Aktualisiere den Bildschirm
     pygame.display.flip()
+    clock.tick(60)  # Begrenze die Bildrate auf 60 FPS
 
 # Pygame beenden
 pygame.quit()

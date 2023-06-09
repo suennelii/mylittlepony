@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 # Bildschirmeinstellungen
 WIDTH = 1000
@@ -40,30 +41,6 @@ for _ in range(5):
     dreieck = Dreieck(size, speed)
     all_sprites.add(dreieck)
 
-# Partikel-Effekt
-particles = []
-
-class Particle:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.size = random.randint(1, 3)
-        self.color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
-        self.vel_x = random.uniform(-1, 1)
-        self.vel_y = random.uniform(-1, 1)
-        self.alpha = 255
-        self.duration = random.randint(30, 60)
-
-    def update(self):
-        self.x += self.vel_x
-        self.y += self.vel_y
-        self.alpha -= 255 / self.duration
-        if self.alpha <= 0:
-            particles.remove(self)
-
-    def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.size)
-
 running = True
 while running:
     clock.tick(FPS)
@@ -71,9 +48,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                particles.extend([Particle(dreieck.rect.centerx, dreieck.rect.centery) for dreieck in all_sprites])
 
     # Aktualisiere die Geschwindigkeit alle 15 Sekunden
     if pygame.time.get_ticks() % 15000 == 0:
@@ -83,11 +57,6 @@ while running:
 
     screen.fill((0, 0, 0))
     all_sprites.draw(screen)
-
-    # Partikel-Effekte aktualisieren und zeichnen
-    for particle in particles:
-        particle.update()
-        particle.draw(screen)
 
     pygame.display.flip()
 

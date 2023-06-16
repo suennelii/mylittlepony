@@ -106,29 +106,6 @@ for _ in range(10):
     stars.add(star)
     all_sprites.add(star)
 
-# Hindernis-Klasse
-class Obstacle(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((255, 0, 0))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-
-    def update(self):
-        self.rect.x -= 5
-        if self.rect.right < 0:
-            self.rect.x = width
-            self.rect.y = random.randint(0, sky_height)
-
-# Hindernisse erstellen
-obstacles = pygame.sprite.Group()
-for _ in range(5):
-    obstacle = Obstacle(width + random.randint(100, 400), random.randint(0, sky_height))
-    obstacles.add(obstacle)
-    all_sprites.add(obstacle)
-
 # Hauptprogramm
 running = True
 game_over = False

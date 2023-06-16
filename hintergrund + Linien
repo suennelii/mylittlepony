@@ -1,0 +1,66 @@
+import pygame
+
+# Fenstergröße festlegen
+WIDTH = 800
+HEIGHT = 600
+
+# Farben definieren
+WHITE = (255, 255, 255)
+
+# Pygame initialisieren
+pygame.init()
+
+# Fenster erstellen
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Hintergrundfarbe festlegen
+window.fill((0, 0, 0))
+
+# Linie zeichnen
+pygame.draw.line(window, WHITE, (0, 10), (WIDTH, 10), 1)
+
+# Fenster aktualisieren
+pygame.display.flip()
+
+# Schleife für das Schließen des Fensters
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+# Pygame beenden
+pygame.quit()
+import pygame
+
+# Fenstergröße festlegen
+WIDTH = 800
+HEIGHT = 600
+
+# Farben definieren
+black = (0,0,0)
+
+# Pygame initialisieren
+pygame.init()
+
+# Fenster erstellen
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Hintergrundfarbe festlegen
+window.fill((0, 0, 0))
+
+# Linie zeichnen
+pygame.draw.line(window, WHITE, (0, 10), (WIDTH, 10), 1)
+
+# Fenster aktualisieren
+pygame.display.flip()
+
+# Schleife für das Schließen des Fensters
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+# Pygame beenden
+pygame.quit()

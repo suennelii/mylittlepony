@@ -80,6 +80,22 @@ class Player(pygame.sprite.Sprite):
         self.y_velocity = self.jump_power
         particles.extend([Particle(self.rect.centerx, self.rect.centery) for _ in range(10)])
 
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.Surface((width, height))
+        self.image.fill((255, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        self.rect.x -= 5
+        if self.rect.right < 0:
+            self.kill()
+        if self.rect.colliderect(player.rect):
+            show_game_over_screen()
+
 def show_game_over_screen():
     screen.fill(SKY_BLUE)
     font = pygame.font.Font(None, 36)
@@ -87,10 +103,15 @@ def show_game_over_screen():
     text_rect = text.get_rect(center=(width / 2, height / 2))
     screen.blit(text, text_rect)
 
-    play_button_text = font.render("Play Again", True, WHITE)
-    play_button_rect = play_button_text.get_rect(center=(width / 2, height / 2 + 50))
-    pygame.draw.rect(screen, WHITE, play_button_rect, border_radius=10)
-    screen.blit(play_button_text, play_button_rect)
+    global remaining_time
+    time_text = font.render("Time: " + str(remaining_time) + "s", True, WHITE)
+    time_text_rect = time_text.get_rect(center=(width / 2, height / 2 + 100))
+    screen.blit(time_text, time_text_rect)
+
+    retry_button_text = font.render("Retry", True, WHITE)
+    retry_button_rect = retry_button_text.get_rect(center=(width / 2, height / 2 + 50))
+    pygame.draw.rect(screen, WHITE, retry_button_rect, border_radius=10)
+    screen.blit(retry_button_text, retry_button_rect)
 
     pygame.display.flip()
 
@@ -100,13 +121,18 @@ def show_game_over_screen():
                 pygame.quit()
                 return
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if play_button_rect.collidepoint(event.pos):
+                if retry_button_rect.collidepoint(event.pos):
+                    # Starte einen neuen Versuch
                     return
+
+# ...
+
+# Im Hauptprogramm:
 
 def show_start_screen():
     screen.fill(SKY_BLUE)
     font = pygame.font.Font(None, 36)
-    title_text = font.render("My Little Jumping Pony", True, WHITE)
+    title_text = font.render("My little jumping Pony", True, WHITE)
     title_text_rect = title_text.get_rect(center=(width / 2, height / 2 - 50))
     screen.blit(title_text, title_text_rect)
 
@@ -118,6 +144,7 @@ def show_start_screen():
     pygame.display.flip()
 
     countdown_start_time = None
+    global remaining_time
 
     while True:
         for event in pygame.event.get():
@@ -127,6 +154,7 @@ def show_start_screen():
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if play_button_rect.collidepoint(event.pos):
                     countdown_start_time = pygame.time.get_ticks()
+                    remaining_time = countdown_duration // 1000  # Convert milliseconds to seconds
 
         if countdown_start_time is not None:
             current_time = pygame.time.get_ticks()
@@ -148,8 +176,11 @@ player = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 
+obstacles = pygame.sprite.Group()
+
 # Countdown-Variablen
 countdown_duration = 3000  # 3 Sekunden in Millisekunden
+remaining_time = 0
 
 # Startbildschirm anzeigen
 show_start_screen()
@@ -157,6 +188,8 @@ show_start_screen()
 # Hauptprogramm
 running = True
 clock = pygame.time.Clock()
+obstacle_spawn_timer = pygame.time.get_ticks()
+
 while running:
     # Ereignisse überprüfen
     for event in pygame.event.get():
@@ -202,6 +235,17 @@ while running:
 
     all_sprites.update()
     all_sprites.draw(screen)
+
+    # Hindernisse erzeugen
+    current_time = pygame.time.get_ticks()
+    if current_time - obstacle_spawn_timer > 2000:  # Alle 2 Sekunden ein Hindernis erzeugen
+        obstacle_height = random.randint(50, height - 200)
+        obstacle = Obstacle(width, 0, 50, obstacle_height)
+        obstacles.add(obstacle)
+        all_sprites.add(obstacle)
+        obstacle_spawn_timer = current_time
+
+    obstacles.update()
 
     # Aktualisiere den Bildschirm
     pygame.display.flip()

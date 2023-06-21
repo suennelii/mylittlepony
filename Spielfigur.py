@@ -103,11 +103,6 @@ def show_game_over_screen():
     text_rect = text.get_rect(center=(width / 2, height / 2))
     screen.blit(text, text_rect)
 
-    global remaining_time
-    time_text = font.render("Time: " + str(remaining_time) + "s", True, WHITE)
-    time_text_rect = time_text.get_rect(center=(width / 2, height / 2 + 100))
-    screen.blit(time_text, time_text_rect)
-
     retry_button_text = font.render("Retry", True, WHITE)
     retry_button_rect = retry_button_text.get_rect(center=(width / 2, height / 2 + 50))
     pygame.draw.rect(screen, WHITE, retry_button_rect, border_radius=10)
@@ -239,8 +234,8 @@ while running:
     # Hindernisse erzeugen
     current_time = pygame.time.get_ticks()
     if current_time - obstacle_spawn_timer > 2000:  # Alle 2 Sekunden ein Hindernis erzeugen
-        obstacle_height = random.randint(50, height - 200)
-        obstacle = Obstacle(width, 0, 50, obstacle_height)
+        obstacle_height = random.randint(50, height - 80)
+        obstacle = Obstacle(width, obstacle_height, 50, height - obstacle_height)
         obstacles.add(obstacle)
         all_sprites.add(obstacle)
         obstacle_spawn_timer = current_time

@@ -261,4 +261,3 @@ while running:
 
 # Spiel beenden
 pygame.quit()
-

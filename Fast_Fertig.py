@@ -104,7 +104,7 @@ def show_game_over_screen():
     text_rect = text.get_rect(center=(width / 2, height / 2))
     screen.blit(text, text_rect)
 
-    retry_button_text = font.render("Retry", True, BLACK)
+    retry_button_text = font.render("Schliesse das Spiel, um neu zu starten", True, BLACK)
     retry_button_rect = retry_button_text.get_rect(center=(width / 2, height / 2 + 50))
     pygame.draw.rect(screen, WHITE, retry_button_rect, border_radius=10)
     screen.blit(retry_button_text, retry_button_rect)

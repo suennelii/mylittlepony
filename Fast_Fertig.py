@@ -131,6 +131,10 @@ def show_start_screen():
     title_text_rect = title_text.get_rect(center=(width / 2, height / 2 - 50))
     screen.blit(title_text, title_text_rect)
 
+    authors_text = font.render("Ein Spiel von Khaled, Eliah, Lorena und Elona", True, WHITE)
+    authors_text_rect = authors_text.get_rect(center=(width / 2, height / 2))
+    screen.blit(authors_text, authors_text_rect)
+
     play_button_text = font.render("Play", True, WHITE)
     play_button_rect = play_button_text.get_rect(center=(width / 2, height / 2 + 50))
     pygame.draw.rect(screen, WHITE, play_button_rect, border_radius=10)
@@ -165,6 +169,7 @@ def show_start_screen():
                 return
 
         pygame.display.flip()
+
 
 # Spieler erstellen
 player = Player()

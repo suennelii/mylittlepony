@@ -207,21 +207,21 @@ while running:
     # Hintergrund zeichnen
     screen.fill(SKY_BLUE)
 
-    # Wolken zeichnen
-    for cloud in clouds:
-        cloud_x, cloud_y, cloud_speed = cloud
-        pygame.draw.circle(screen, WHITE, (cloud_x, cloud_y), 20)
+    # Wolken bewegen
+    for i in range(len(clouds)):
+        cloud_x, cloud_y, cloud_speed = clouds[i]
         cloud_x -= cloud_speed
-        if cloud_x < -20:
-            cloud_x = width + 20
+        if cloud_x < -200:
+            cloud_x = width
             cloud_y = random.randint(0, int(sky_height / 2))
             cloud_speed = random.randint(1, 3)
-        cloud = (cloud_x, cloud_y, cloud_speed)
+        clouds[i] = (cloud_x, cloud_y, cloud_speed)
 
-    # Partikel zeichnen
-    for particle in particles:
-        particle.update()
-        particle.draw(screen)
+        # Wolken zeichnen
+        pygame.draw.ellipse(screen, WHITE, (cloud_x, cloud_y, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y - 25, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 50, cloud_y, 100, 50))
+        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y + 25, 100, 50))
 
     # Hindernisse aktualisieren und zeichnen
     current_time = pygame.time.get_ticks()
@@ -241,6 +241,11 @@ while running:
 
     # Sprites zeichnen
     all_sprites.draw(screen)
+
+    # Partikel zeichnen
+    for particle in particles:
+        particle.update()
+        particle.draw(screen)
 
     # Bildschirm aktualisieren
     pygame.display.flip()

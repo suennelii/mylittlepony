@@ -104,7 +104,7 @@ def show_game_over_screen():
     text_rect = text.get_rect(center=(width / 2, height / 2))
     screen.blit(text, text_rect)
 
-    retry_button_text = font.render("Retry", True, WHITE)
+    retry_button_text = font.render("Retry", True, BLACK)
     retry_button_rect = retry_button_text.get_rect(center=(width / 2, height / 2 + 50))
     pygame.draw.rect(screen, WHITE, retry_button_rect, border_radius=10)
     screen.blit(retry_button_text, retry_button_rect)
@@ -163,7 +163,7 @@ def show_start_screen():
                 countdown_seconds = (countdown_duration - (current_time - countdown_start_time)) // 1000 + 1
                 countdown_text = str(countdown_seconds)
                 font = pygame.font.Font(None, 100)
-                text = font.render(countdown_text, True, WHITE)
+                text = font.render(countdown_text, True, BLACK)
                 text_rect = text.get_rect(center=(width / 2, height / 2))
                 screen.blit(text, text_rect)
             else:

@@ -99,7 +99,7 @@ class Obstacle(pygame.sprite.Sprite):
 def show_game_over_screen():
     screen.fill(SKY_BLUE)
     font = pygame.font.Font(None, 36)
-    text = font.render("Game Over", True, WHITE)
+    text = font.render("Du bist gestorben, versuche es nochmal!", True, WHITE)
     text_rect = text.get_rect(center=(width / 2, height / 2))
     screen.blit(text, text_rect)
 
@@ -131,7 +131,7 @@ def show_start_screen():
     title_text_rect = title_text.get_rect(center=(width / 2, height / 2 - 50))
     screen.blit(title_text, title_text_rect)
 
-    authors_text = font.render("Ein Spiel von Khaled, Eliah, Lorena und Elona", True, WHITE)
+    authors_text = font.render("Spiel von Khaled, Eliah, Lorena & Elona, gewidmet an Herr Fuchs ", True, WHITE)
     authors_text_rect = authors_text.get_rect(center=(width / 2, height / 2))
     screen.blit(authors_text, authors_text_rect)
 

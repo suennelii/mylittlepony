@@ -24,7 +24,7 @@ for _ in range(6):
    clouds.append((cloud_x, cloud_y, cloud_speed))
 
 # Spielfigur laden
-player_image = pygame.image.load("bbc.png.png")
+player_image = pygame.image.load("bbc.png")
 player_width = 100
 player_height = 100
 

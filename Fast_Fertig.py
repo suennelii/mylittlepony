@@ -136,6 +136,10 @@ def show_start_screen():
     pygame.draw.rect(screen, WHITE, play_button_rect, border_radius=10)
     screen.blit(play_button_text, play_button_rect)
 
+    game_by_text = font.render("Ein Spiel von Khaled, Eliah, Lorena und Elona", True, WHITE)
+    game_by_text_rect = game_by_text.get_rect(center=(width / 2, height / 2 + 100))
+    screen.blit(game_by_text, game_by_text_rect)
+
     pygame.display.flip()
 
     countdown_start_time = None
@@ -199,53 +203,41 @@ while running:
         player.rect.x -= 5
     if keys[pygame.K_RIGHT]:
         player.rect.x += 5
-    if keys[pygame.K_UP]:
-        player.rect.y -= 5
-    if keys[pygame.K_DOWN]:
-        player.rect.y += 5
 
     # Hintergrund zeichnen
     screen.fill(SKY_BLUE)
 
-    # Wolken bewegen
-    for i in range(len(clouds)):
-        cloud_x, cloud_y, cloud_speed = clouds[i]
+    # Wolken zeichnen
+    for cloud in clouds:
+        cloud_x, cloud_y, cloud_speed = cloud
         cloud_x -= cloud_speed
-        if cloud_x < -200:
+        if cloud_x < -100:
             cloud_x = width
             cloud_y = random.randint(0, int(sky_height / 2))
-            cloud_speed = random.randint(1, 3)
-        clouds[i] = (cloud_x, cloud_y, cloud_speed)
+        cloud = (cloud_x, cloud_y, cloud_speed)
+        clouds.append(cloud)
+        pygame.draw.circle(screen, WHITE, (cloud_x, cloud_y), 50)
 
-        # Wolken zeichnen
-        pygame.draw.ellipse(screen, WHITE, (cloud_x, cloud_y, 100, 50))
-        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y - 25, 100, 50))
-        pygame.draw.ellipse(screen, WHITE, (cloud_x + 50, cloud_y, 100, 50))
-        pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y + 25, 100, 50))
-
-    # Hindernisse aktualisieren und zeichnen
+    # Hindernisse aktualisieren
     current_time = pygame.time.get_ticks()
     if current_time - obstacle_spawn_timer > 1500:
-        obstacle_spawn_timer = current_time
-        obstacle_height = random.randint(50, 200)
-        obstacle_y = random.randint(0, height - obstacle_height)
-        obstacle = Obstacle(width, obstacle_y, 30, obstacle_height)
+        obstacle = Obstacle(width, height - 100, 50, 100)
         obstacles.add(obstacle)
         all_sprites.add(obstacle)
+        obstacle_spawn_timer = current_time
 
     obstacles.update()
-    obstacles.draw(screen)
 
-    # Spieler aktualisieren
-    all_sprites.update()
+    # Partikel aktualisieren und zeichnen
+    for particle in particles:
+        particle.update()
+        particle.draw(screen)
 
     # Sprites zeichnen
     all_sprites.draw(screen)
 
-    # Partikel zeichnen
-    for particle in particles:
-        particle.update()
-        particle.draw(screen)
+    # Spieler aktualisieren
+    player.update()
 
     # Bildschirm aktualisieren
     pygame.display.flip()
@@ -253,5 +245,5 @@ while running:
     # Framerate begrenzen
     clock.tick(60)
 
-# Spiel beenden
+# Beenden
 pygame.quit()

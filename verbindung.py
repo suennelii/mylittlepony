@@ -1,250 +1,112 @@
 import pygame
 import random
 
-# Initialisierung
+# Initialize pygame
 pygame.init()
 
-# Bildschirmgröße
+# Set up the game window
 width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Snake Game")
 
-# Farben
-SKY_BLUE = (135, 206, 235)
-WHITE = (255, 255, 255)
+# Colors
+blue = (0, 0, 255)
+red = (255, 0, 0)
 
-# Himmel Größe
-sky_height = height
+# Snake class
+class Snake:
+    def __init__(self):
+        self.size = 1
+        self.positions = [(width // 2, height // 2)]
+        self.direction = random.choice(["up", "down", "left", "right"])
 
-# Wolken
-clouds = []
-for _ in range(6):
-   cloud_x = random.randint(0, width)
-   cloud_y = random.randint(0, int(sky_height / 2))
-   cloud_speed = random.randint(1, 3)
-   clouds.append((cloud_x, cloud_y, cloud_speed))
+    def get_head_position(self):
+        return self.positions[0]
 
-# Spielfigur laden
-player_image = pygame.image.load("bbc.png.png")
-player_width = 100
-player_height = 100
+    def move(self):
+        x, y = self.get_head_position()
+        if self.direction == "up":
+            y -= 10
+        elif self.direction == "down":
+            y += 10
+        elif self.direction == "left":
+            x -= 10
+        elif self.direction == "right":
+            x += 10
+        self.positions.insert(0, (x, y))
+        if len(self.positions) > self.size:
+            self.positions.pop()
 
-# Partikel-Effekt
-particles = []
+    def change_direction(self, direction):
+        if direction == "up" and self.direction != "down":
+            self.direction = "up"
+        elif direction == "down" and self.direction != "up":
+            self.direction = "down"
+        elif direction == "left" and self.direction != "right":
+            self.direction = "left"
+        elif direction == "right" and self.direction != "left":
+            self.direction = "right"
 
-class Particle:
-   def __init__(self, x, y):
-       self.x = x
-       self.y = y
-       self.size = random.randint(1, 3)
-       self.color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
-       self.vel_x = random.uniform(-1, 1)
-       self.vel_y = random.uniform(-1, 1)
-       self.alpha = 255
-       self.duration = random.randint(30, 60)
+    def draw(self, window):
+        for position in self.positions:
+            pygame.draw.rect(window, red, (position[0], position[1], 10, 10))
 
-   def update(self):
-       self.x += self.vel_x
-       self.y += self.vel_y
-       self.alpha -= 255 / self.duration
-       if self.alpha <= 0:
-           particles.remove(self)
+# Object class
+class Object:
+    def __init__(self):
+        self.position = (random.randint(0, width-10), random.randint(0, height-10))
 
-   def draw(self, screen):
-       pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.size)
+    def draw(self, window):
+        pygame.draw.rect(window, blue, (self.position[0], self.position[1], 10, 10))
 
-# Spielerklasse
-class Player(pygame.sprite.Sprite):
-   def __init__(self):
-       super().__init__()
-       self.image = pygame.transform.scale(player_image, (player_width, player_height))
-       self.rect = self.image.get_rect()
-       self.rect.center = (width / 2, height / 2)
-       self.y_velocity = 0
-       self.jump_power = -10
-
-   def update(self):
-       self.y_velocity += 1
-       self.rect.y += self.y_velocity
-
-       if self.rect.bottom > height:
-           self.rect.bottom = height
-           self.y_velocity = 0
-           show_game_over_screen()
-
-       if self.rect.top < 0:
-           self.rect.top = 0
-           self.y_velocity = 0
-           show_game_over_screen()
-
-   def jump(self):
-       self.y_velocity = self.jump_power
-       particles.extend([Particle(self.rect.centerx, self.rect.centery) for _ in range(10)])
-
-class Obstacle(pygame.sprite.Sprite):
-   def __init__(self, x, y, width, height):
-       super().__init__()
-       self.image = pygame.Surface((width, height))
-       self.image.fill((255, 0, 0))
-       self.rect = self.image.get_rect()
-       self.rect.x = x
-       self.rect.y = y
-
-   def update(self):
-       self.rect.x -= 5
-       if self.rect.right < 0:
-           self.kill()
-       if self.rect.colliderect(player.rect):
-           show_game_over_screen()
-
-def show_game_over_screen():
-   screen.fill(SKY_BLUE)
-   font = pygame.font.Font(None, 36)
-   text = font.render("Game Over", True, WHITE)
-   text_rect = text.get_rect(center=(width / 2, height / 2))
-   screen.blit(text, text_rect)
-
-   retry_button_text = font.render("Retry", True, WHITE)
-   retry_button_rect = retry_button_text.get_rect(center=(width / 2, height / 2 + 50))
-   pygame.draw.rect(screen, WHITE, retry_button_rect, border_radius=10)
-   screen.blit(retry_button_text, retry_button_rect)
-
-   pygame.display.flip()
-
-   while True:
-       for event in pygame.event.get():
-           if event.type == pygame.QUIT:
-               pygame.quit()
-               return
-           elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-               if retry_button_rect.collidepoint(event.pos):
-                   # Starte einen neuen Versuch
-                   return
-
-# ...
-
-# Im Hauptprogramm:
-
-def show_start_screen():
-   screen.fill(SKY_BLUE)
-   font = pygame.font.Font(None, 36)
-   title_text = font.render("My little jumping Pony", True, WHITE)
-   title_text_rect = title_text.get_rect(center=(width / 2, height / 2 - 50))
-   screen.blit(title_text, title_text_rect)
-
-   play_button_text = font.render("Play", True, WHITE)
-   play_button_rect = play_button_text.get_rect(center=(width / 2, height / 2 + 50))
-   pygame.draw.rect(screen, WHITE, play_button_rect, border_radius=10)
-   screen.blit(play_button_text, play_button_rect)
-
-   pygame.display.flip()
-
-   countdown_start_time = None
-   global remaining_time
-
-   while True:
-       for event in pygame.event.get():
-           if event.type == pygame.QUIT:
-               pygame.quit()
-               return
-           elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-               if play_button_rect.collidepoint(event.pos):
-                   countdown_start_time = pygame.time.get_ticks()
-                   remaining_time = countdown_duration // 1000  # Convert milliseconds to seconds
-
-       if countdown_start_time is not None:
-           current_time = pygame.time.get_ticks()
-           if current_time - countdown_start_time < countdown_duration:
-               screen.fill(SKY_BLUE)
-               countdown_seconds = (countdown_duration - (current_time - countdown_start_time)) // 1000 + 1
-               countdown_text = str(countdown_seconds)
-               font = pygame.font.Font(None, 100)
-               text = font.render(countdown_text, True, WHITE)
-               text_rect = text.get_rect(center=(width / 2, height / 2))
-               screen.blit(text, text_rect)
-           else:
-               return
-
-       pygame.display.flip()
-
-# Spieler erstellen
-player = Player()
-all_sprites = pygame.sprite.Group()
-all_sprites.add(player)
-
-obstacles = pygame.sprite.Group()
-
-# Countdown-Variablen
-countdown_duration = 3000  # 3 Sekunden in Millisekunden
-remaining_time = 0
-
-# Startbildschirm anzeigen
-show_start_screen()
-
-# Hauptprogramm
-running = True
+# Set up the game
+snake = Snake()
+obj = Object()
 clock = pygame.time.Clock()
-obstacle_spawn_timer = pygame.time.get_ticks()
 
-while running:
-   # Ereignisse überprüfen
-   for event in pygame.event.get():
-       if event.type == pygame.QUIT:
-           running = False
-       elif event.type == pygame.KEYDOWN:
-           if event.key == pygame.K_SPACE:
-               player.jump()
+# Game loop
+game_over = False
+while not game_over:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_over = True
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                snake.change_direction("up")
+            elif event.key == pygame.K_s:
+                snake.change_direction("down")
+            elif event.key == pygame.K_a:
+                snake.change_direction("left")
+            elif event.key == pygame.K_d:
+                snake.change_direction("right")
 
-   keys = pygame.key.get_pressed()
-   if keys[pygame.K_LEFT]:
-       player.rect.x -= 5
-   if keys[pygame.K_RIGHT]:
-       player.rect.x += 5
-   if keys[pygame.K_UP]:
-       player.rect.y -= 5
-   if keys[pygame.K_DOWN]:
-       player.rect.y += 5
+    # Move the snake
+    snake.move()
 
-   # Hintergrund zeichnen
-   screen.fill(SKY_BLUE)
+    # Check for collisions
+    if snake.get_head_position() == obj.position:
+        snake.size += 1
+        obj = Object()
 
-   # Wolken bewegen
-   for i in range(len(clouds)):
-       cloud_x, cloud_y, cloud_speed = clouds[i]
-       cloud_x -= cloud_speed
-       if cloud_x < -200:
-           cloud_x = width
-           cloud_y = random.randint(0, int(sky_height / 2))
-           cloud_speed = random.randint(1, 3)
-       clouds[i] = (cloud_x, cloud_y, cloud_speed)
+    # Check for self-collision or border collision
+    if (
+        snake.get_head_position() in snake.positions[1:]
+        or snake.get_head_position()[0] < 0
+        or snake.get_head_position()[0] >= width
+        or snake.get_head_position()[1] < 0
+        or snake.get_head_position()[1] >= height
+    ):
+        game_over = True
 
-       # Wolken zeichnen
-       pygame.draw.ellipse(screen, WHITE, (cloud_x, cloud_y, 100, 50))
-       pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y - 25, 100, 50))
-       pygame.draw.ellipse(screen, WHITE, (cloud_x + 50, cloud_y, 100, 50))
-       pygame.draw.ellipse(screen, WHITE, (cloud_x + 25, cloud_y + 25, 100, 50))
+    # Draw on the window
+    window.fill((0, 0, 0))
+    snake.draw(window)
+    obj.draw(window)
+    pygame.display.update()
 
-   # Partikel-Effekte aktualisieren und zeichnen
-   for particle in particles:
-       particle.update()
-       particle.draw(screen)
+    # Set the game speed
+    clock.tick(20)
 
-   all_sprites.update()
-   all_sprites.draw(screen)
-
-   # Hindernisse erzeugen
-   current_time = pygame.time.get_ticks()
-   if current_time - obstacle_spawn_timer > 2000:  # Alle 2 Sekunden ein Hindernis erzeugen
-       obstacle_height = random.randint(50, height - 80)
-       obstacle = Obstacle(width, obstacle_height, 50, height - obstacle_height)
-       obstacles.add(obstacle)
-       all_sprites.add(obstacle)
-       obstacle_spawn_timer = current_time
-
-   obstacles.update()
-
-   # Aktualisiere den Bildschirm
-   pygame.display.flip()
-   clock.tick(60)  # Begrenze die Bildrate auf 60 FPS
-
-# Pygame beenden
+# Quit the game
 pygame.quit()

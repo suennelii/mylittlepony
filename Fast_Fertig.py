@@ -136,7 +136,7 @@ def show_start_screen():
     authors_text_rect = authors_text.get_rect(center=(width / 2, height / 2))
     screen.blit(authors_text, authors_text_rect)
 
-    play_button_text = font.render("Play", True, BLACK)
+    play_button_text = font.render("PLAY", True, BLACK)
     play_button_rect = play_button_text.get_rect(center=(width / 2, height / 2 + 50))
     pygame.draw.rect(screen, WHITE, play_button_rect, border_radius=10)
     screen.blit(play_button_text, play_button_rect)
